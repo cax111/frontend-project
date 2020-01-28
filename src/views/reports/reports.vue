@@ -10,7 +10,7 @@
         </v-breadcrumbs>
           <v-card>
             <v-card-title>
-                <v-icon class="mr-2">mdi-truck-fast-outline</v-icon> Data Orders
+                <v-icon class="mr-2">mdi-truck-fast-outline</v-icon> Data Rekap
               <v-spacer></v-spacer>
               <v-text-field
                 v-model="search"
@@ -22,13 +22,13 @@
             </v-card-title>
             <v-data-table
               :headers="headers"
-              :items="dataOrders.orders"
+              :items="dataOrders.rekap"
               :search="search"
             >
               <template v-slot:item.aksi="{ item }">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on }">
-                    <v-btn color="primary" :to="'orders/order-detail/'+dataOrders.orders[dataOrders.orders.indexOf(item)].id" v-on="on" class="ma-4"><v-icon>mdi-table-eye</v-icon></v-btn>
+                    <v-btn color="primary" :to="'orders/order-detail/'+dataOrders.rekap[dataOrders.rekap.indexOf(item)].id" v-on="on" class="ma-4"><v-icon>mdi-table-eye</v-icon></v-btn>
                   </template>
                   <span>Detail Order</span>
                 </v-tooltip>
@@ -96,14 +96,11 @@ export default {
   methods: {
     getItemsPage(){
       this.loading = true
-      axios.defaults.headers = {
-        'Authorization': window.localStorage.getItem('access_token')
-      }
-      axios.get('/stok?pager.limit='+100+'&pager.page='+1)
+      axios.get('/rekap/ambil?pager.limit='+100+'&pager.page='+1)
       .then(response => {
           this.dataOrders = response.data
           this.loading = false
-          console.log(this.dataOrders.orders)
+          console.log(this.dataOrders)
       })
       .catch(error =>{
           console.log(error.response)

@@ -7,9 +7,6 @@
     <v-content>
       <v-container>
         <v-breadcrumbs :items="items">
-          <template v-slot:divider>
-            <v-icon>mdi-forward</v-icon>
-          </template>
         </v-breadcrumbs>
           <v-card>
             <v-card-title>
@@ -35,6 +32,12 @@
                     <v-btn color="warning" :to="'show-accounts/edit-account/'+showDataUsers[showDataUsers.indexOf(item)].id" v-on="on" class="ma-4"><v-icon>mdi-tooltip-edit</v-icon></v-btn>
                   </template>
                   <span>Edit Data ?</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn color="warning" :to="'show-accounts/edit-password-account/'+showDataUsers[showDataUsers.indexOf(item)].id" v-on="on" class="ma-4"><v-icon>mdi-textbox-password</v-icon></v-btn>
+                  </template>
+                  <span>Ganti Password ?</span>
                 </v-tooltip>
                 <v-tooltip bottom v-if="role === 'SUPERADMIN'">
                   <template v-slot:activator="{ on }">
@@ -124,9 +127,9 @@ export default {
     }
   },
   mounted(){
-    this.role = this.$store.state.role
+    this.role = window.localStorage.getItem('role')
     axios.defaults.headers = {
-      'Authorization': this.$store.state.token
+      'Authorization': window.localStorage.getItem('access_token')
     }
     axios.get('/users')
     .then(response => {

@@ -8,7 +8,7 @@ import axios from 'axios';
 export default {
   mounted(){
     axios.defaults.headers = {
-      'Authorization': this.$store.state.token
+      'Authorization': window.localStorage.getItem('access_token')
     }
     axios.delete('/gudang/'+this.$route.params.id)
     .then(response => {

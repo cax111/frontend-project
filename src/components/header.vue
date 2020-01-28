@@ -17,18 +17,20 @@
             </v-list-item-content>
           </v-list-item>
 
+          <v-list-item-content class='ml-6' v-if="dataUser.role==='USER'">
+            <v-list-item-subtitle>{{ dataUser.email }}</v-list-item-subtitle>
+          </v-list-item-content>
 
           <v-list-group
-          no-action
+          v-else
           >
             <template v-slot:activator>
               <v-list-item
-                link
                 two-line
                 @click="show = !show"
               >
-              <v-list-item-content class='ma-4'>
-                <v-list-item-title class="title">User Panel</v-list-item-title>
+              <v-list-item-content>
+                <v-list-item-title>User Panel</v-list-item-title>
                 <v-list-item-subtitle>{{ dataUser.email }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
@@ -36,9 +38,14 @@
               </v-list-item-action>
               </v-list-item>
             </template>
-            <v-list-item :to="'show-accounts/edit-account/'+dataUser.id">
+            <v-list-item :to="'/show-accounts/edit-account/'+dataUser.id">
               <v-list-item-content>
                 <v-list-item-title><v-icon>mdi-tooltip-edit</v-icon> Edit User</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item :to="'/show-accounts/edit-password-account/'+dataUser.id">
+              <v-list-item-content>
+                <v-list-item-title><v-icon>mdi-tooltip-edit</v-icon> Ganti Password</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-group>
@@ -155,11 +162,12 @@ export default {
     items: [
       { icon: 'mdi-home', link: '/', role: '', text: 'Dashboard' },
       { icon: 'mdi-warehouse', link: '/gudang', role: '', text: 'Gudang' },
-      { icon: 'mdi-home-city-outline', link: '/suppliers', role: '', text: 'Suppliers' },
-      { icon: 'mdi-dropbox', link: '/items', text: 'Items' },
-      { icon: 'mdi-truck-fast-outline', link: '/orders', text: 'Orders' },
-      { icon: 'mdi-account-group', link: '/show-accounts', role: 'USER', text: 'Account Management' },
-      { icon: 'mdi-file-document-box-multiple-outline', link: '', text: 'Reports' },
+      { icon: 'mdi-home-city-outline', link: '/suppliers', role: '', text: 'Supplier' },
+      { icon: 'mdi-dropbox', link: '/items', text: 'Barang' },
+      { icon: 'mdi-truck-fast-outline', link: '/orders', text: 'Pengambilan Barang' },
+      { icon: 'mdi-account-group', link: '/show-accounts', role: 'USER', text: 'Manajemen User' },
+      { icon: 'mdi-settings', link: '/units', role: 'USER', text: 'Pengaturan Satuan' },
+      { icon: 'mdi-file-document-box-multiple-outline', link: '/rekap', text: 'Rekap' },
       // {
       //   icon: 'mdi-chevron-up',
       //   'icon-alt': 'mdi-chevron-down',
@@ -171,7 +179,7 @@ export default {
       // },
       // {
       //   icon: 'mdi-chevron-up',
-      //   'icon-alt': 'mdi-chevron-down',
+      //   'icon-alt': 'mdi-chevron-down',a
       //   text: 'More',
       //   model: false,
       //   children: [
@@ -184,34 +192,33 @@ export default {
       // },
     ],
   }),
-  methods: {
-  },
+  // methods: {
+  // },
   mounted(){
+    if(!window.localStorage.getItem('last_login') || !window.localStorage.getItem('getIdUser') || !window.localStorage.getItem('role') || !window.localStorage.getItem('access_token')){
+      window.location.href = "/logout";
+    }
     const last_login = new Date(window.localStorage.getItem('last_login'))
     let batas_login = new Date(last_login)
     const now_login = new Date()
     batas_login = new Date(batas_login.setMinutes((last_login.getMinutes() + 20)))
     if(now_login > batas_login){
       alert("Sesi anda telah berakhir, silakan login kembali...");
-      window.location.href = "/logout"
+      window.location.href = "/logout";
     }
     for(let i=0;i<this.items.length;i++){
-      if(this.items[i].role === this.$store.state.role){
-        this.items.splice(i, 1)
+      if(this.items[i].role === window.localStorage.getItem('role')){
+        this.items.splice(i, 1);
       }
-
     }
-    axios.defaults.headers = {
-      'Authorization': this.$store.state.token
-    }
-    axios.get('/users/'+this.$store.state.idUser)
+    axios.get('/users/'+window.localStorage.getItem('getIdUser'))
     .then(response => {
-        this.dataUser = response.data
+        this.dataUser = response.data;
         //console.log(JSON.stringify(response.data))
     })
     .catch(error =>{
-        console.log(error.response)
+        console.log(error.response);
     })
   }
-}
+};
 </script>

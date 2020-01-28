@@ -7,9 +7,6 @@
     <v-content>
       <v-container>
         <v-breadcrumbs :items="items">
-          <template v-slot:divider>
-            <v-icon>mdi-forward</v-icon>
-          </template>
         </v-breadcrumbs>
           <v-card>
             <v-card-title>
@@ -94,7 +91,7 @@ export default {
   },
   mounted(){
     axios.defaults.headers = {
-      'Authorization': this.$store.state.token
+      'Authorization': window.localStorage.getItem('access_token')
     }
     axios.get('/suppliers')
     .then(response => {

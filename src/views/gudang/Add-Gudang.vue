@@ -7,9 +7,6 @@
     <v-content>
       <v-container>
         <v-breadcrumbs :items="items">
-          <template v-slot:divider>
-            <v-icon>mdi-forward</v-icon>
-          </template>
         </v-breadcrumbs>
         <v-card
           class="mx-auto"
@@ -110,7 +107,6 @@ export default {
     dataSelect: [
       'TETAP',
       'SEMENTARA',
-      'INVALID_GUDANG'
     ],
     checkbox: false,
         name: '',
@@ -127,9 +123,6 @@ export default {
     addGudang(){
       if (this.$refs.form.validate()) {
         this.snackbar = true
-        axios.defaults.headers = {
-          'Authorization': this.$store.state.token
-        }
         axios.post('/gudang', {
           name: this.name,
           alamat: this.alamat,

@@ -7,9 +7,6 @@
     <v-content>
       <v-container>
         <v-breadcrumbs :items="items">
-          <template v-slot:divider>
-            <v-icon>mdi-forward</v-icon>
-          </template>
         </v-breadcrumbs>
         <v-card
           class="mx-auto"
@@ -18,6 +15,7 @@
             <v-list-item-content>
               <v-list-item-title class="headline">{{ dataGudang.name }}</v-list-item-title>
               <v-list-item-subtitle>{{ dataGudang.alamat }}</v-list-item-subtitle>
+              <v-list-item-subtitle>Status Gudang : {{ dataGudang.status }}</v-list-item-subtitle>
             </v-list-item-content>
             <v-spacer></v-spacer>
             <v-tooltip bottom>

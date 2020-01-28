@@ -7,9 +7,6 @@
     <v-content>
       <v-container>
         <v-breadcrumbs :items="items">
-          <template v-slot:divider>
-            <v-icon>mdi-forward</v-icon>
-          </template>
         </v-breadcrumbs>
         <v-card
           class="mx-auto"
@@ -19,6 +16,13 @@
               <v-list-item-title class="headline">{{ dataItems.name }}</v-list-item-title>
               <v-list-item-subtitle>{{ dataItems.kode_barang }}</v-list-item-subtitle>
             </v-list-item-content>
+            <v-spacer/>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn color="warning"  :to="'/items/edit-item/'+dataItems.id" v-on="on" class="ma-4"><v-icon>mdi-tooltip-edit</v-icon></v-btn>
+              </template>
+              <span>Edit Data ?</span>
+            </v-tooltip>
           </v-list-item>
           <v-divider/>
           <v-list-item two-line>

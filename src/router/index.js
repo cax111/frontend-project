@@ -177,7 +177,18 @@ const routes = [
     },
     props:true
   },
-  //------------------------------- route items ----------------------------
+  {
+    path: "/items/edit-item/:id",
+    name: 'edit-item',
+    component: () => import("../views/items/Edit-Item.vue"),
+    meta: {
+      requiredAuth:true,
+      adminAuth:true,
+      superAdminAuth:true,
+    },
+    props:true
+  },
+  //------------------------------- route orders ----------------------------
   {
     path: "/orders",
     name: 'orders',
@@ -235,6 +246,17 @@ const routes = [
     props:true
   },
   {
+    path: "/show-accounts/edit-password-account/:id",
+    name: 'edit-password-account',
+    component: () => import("../views/account-management/Edit-Password-Account.vue"),
+    meta: {
+      requiredAuth:true,
+      adminAuth:true,
+      superAdminAuth:true,
+    },
+    props:true
+  },
+  {
     path: "/show-accounts/delete-account/:id",
     name: 'delete-account',
     component: () => import("../views/account-management/Delete-Account.vue"),
@@ -245,6 +267,31 @@ const routes = [
     },
     props:true
   },
+  //----------------------------- Pengaturan Satuan --------------------------
+  {
+    path: "/units",
+    name: 'show-units',
+    component: () => import("../views/units/Show-Units.vue"),
+    meta: {
+      requiredAuth:true,
+      adminAuth:true,
+      superAdminAuth:true,
+    },
+    props:true
+  },
+  //----------------------------- Rekap --------------------------
+  {
+    path: "/rekap",
+    name: 'rekap',
+    component: () => import("../views/reports/reports.vue"),
+    meta: {
+      requiredAuth:true,
+      adminAuth:true,
+      superAdminAuth:true,
+    },
+    props:true
+  },
+  //----------------------------- route account --------------------------
   {
     path: "/admin",
     name: 'admin',

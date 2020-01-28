@@ -7,9 +7,6 @@
     <v-content>
       <v-container>
         <v-breadcrumbs :items="items">
-          <template v-slot:divider>
-            <v-icon>mdi-forward</v-icon>
-          </template>
         </v-breadcrumbs>
         <v-card
           class="mx-auto"
@@ -53,7 +50,7 @@
             >
               Kembali
             </v-btn>
-            <v-spacer />
+            <v-spacer/>
             <v-btn
               color="success"
               class="mr-4"
@@ -115,7 +112,7 @@ export default {
       if (this.$refs.form.validate()) {
         this.snackbar = true
         axios.defaults.headers = {
-          'Authorization': this.$store.state.token
+          'Authorization': window.localStorage.getItem('access_token')
         }
         axios.put('/suppliers/'+this.$route.params.id, {
           nama: this.name,
@@ -136,7 +133,7 @@ export default {
   },
   mounted(){
     axios.defaults.headers = {
-      'Authorization': this.$store.state.token
+      'Authorization': window.localStorage.getItem('access_token')
     }
     axios.get('/suppliers/'+this.$route.params.id)
     .then(response => {

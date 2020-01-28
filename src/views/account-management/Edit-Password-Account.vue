@@ -12,7 +12,7 @@
           class="mx-auto"
           >
           <v-card-title>
-            Edit Account
+            Ganti Password
           </v-card-title>
             <v-form
               ref="form"
@@ -21,31 +21,25 @@
             >
             <v-card-text>
               <v-text-field
-                v-model="name"
-                :rules="nameRules"
-                label="Nama"
+                v-model="password"
+                :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                :rules="passwordRules"
+                :type="show1 ? 'text' : 'password'"
+                label="Password Baru"
+                hint="Minimal 8 karakter"
+                @click:append="show1 = !show1"
                 required
                 ></v-text-field>
 
               <v-text-field
-                v-model="email"
-                :rules="emailRules"
-                label="E-mail"
+                v-model="passwordUlang"
+                :rules="passwordUlangRules.concat(passwordRule)"
+                type="password"
+                label="Ulangi Password Baru"
+                hint="Minimal 8 karakter"
                 required
               ></v-text-field>
 
-            <v-text-field
-              v-model="phone"
-              :rules="phoneRules"
-              label="No. Telepon"
-              required
-            ></v-text-field>
-            <v-select
-              v-model="role"
-              :items="tipeAkun"
-              label="Tipe Akun"
-              v-if="roleUserLogin==='SUPERADMIN'"
-            ></v-select>
               <v-checkbox
                 v-model="checkbox"
                 :rules="[v => !!v || 'Anda harus setuju untuk melanjutkan!']"
@@ -95,6 +89,7 @@
       Header
     },
     data: () => ({
+      show1: false,
       items: [
           {
             text: 'Dashboard',
@@ -107,46 +102,41 @@
             href: '/show-accounts',
           },
           {
-            text: 'Edit Akun',
+            text: 'Ganti Password',
             disabled: true,
             href: 'breadcrumbs_link_2',
           },
         ],
-        tipeAkun: ['USER','WAREHOUSE_ADMIN','ADMIN'],
       valid: true,
-      name: '',
       dataUser: [],
-      nameRules: [
-        v => !!v || 'Name harus diisi',
+      password: '',
+      passwordRules: [
+        v => !!v || 'Password harus diisi',
+        v => v.length >= 8 || 'Password minimal 8 karakter',
         //v => (v && v.length <= 10) || 'Name must be less than 10 characters',
       ],
-      email: '',
-      emailRules: [
-        v => !!v || 'E-mail harus diisi',
-        v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-      ],
-      phone: '',
-      phoneRules: [
-        v => !!v || 'No. Telepon harus diisi',
+      passwordUlang: '',
+      passwordUlangRules: [
+        v => !!v || 'Password harus diisi',
+        v => v.length >= 8 || 'Password minimal 8 karakter',
       ],
       checkbox: false,
-      roleUserLogin: window.localStorage.getItem('role'),
-      role: null
     }),
 
     methods: {
+      passwordRule(){
+        return this.password === this.passwordUlang || "Password harus sama";
+      },
       editAccount () {
         if (this.$refs.form.validate()) {
           this.snackbar = true
-          if(window.localStorage.getItem('role')==="ADMIN" || window.localStorage.getItem('role')==="WAREHOUSE_ADMIN"){
-            this.role="USER";
+
+          axios.defaults.headers = {
+            'Authorization': window.localStorage.getItem('access_token')
           }
           axios.put('/users/'+this.$route.params.id, {
             id: this.$route.params.id,
-            name: this.name,
-            email: this.email,
-            phone: this.phone,
-            role: this.role,
+            password: this.password,
           })
           .then(response => {
               console.log(JSON.stringify(response.data))
@@ -156,9 +146,6 @@
               console.log(error.response)
           })
         }
-      },
-      reset () {
-        this.$refs.form.reset()
       },
       kembali () {
         this.$router.back()
@@ -176,7 +163,6 @@
           this.name = this.dataUser.name
           this.email = this.dataUser.email
           this.phone = this.dataUser.phone
-          this.role = this.dataUser.role
       })
       .catch(error =>{
           console.log(error.response)

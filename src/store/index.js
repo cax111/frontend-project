@@ -5,7 +5,9 @@ import axios from 'axios';
 Vue.use(Vuex);
 
 axios.defaults.baseURL = 'https://k2.asiatech.dev/v1';
-
+axios.defaults.headers = {
+  'Authorization': window.localStorage.getItem('access_token')
+};
 export default new Vuex.Store({
   state: {
     token: localStorage.getItem('access_token') || null, //get token,

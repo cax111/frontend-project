@@ -10,7 +10,7 @@
         </v-breadcrumbs>
           <v-card>
             <v-card-title>
-              <v-icon class="mr-2">mdi-warehouse</v-icon> Data Gudang
+              <v-icon class="mr-2">mdi-home-city-outline</v-icon> Data Suppliers
               <v-spacer></v-spacer>
               <v-text-field
                 v-model="search"
@@ -22,31 +22,25 @@
             </v-card-title>
             <v-data-table
               :headers="headers"
-              :items="dataGudang.gudangs"
+              :items="dataSuppliers.suppliers"
               :search="search"
               :loading="loading"
               :options.sync="pagination"
-              :server-items-length="dataGudangLength"
+              :server-items-length="dataSuppliersLength"
             >
               <template v-slot:item.aksi="{ item }">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on }">
-                    <v-btn color="primary" :to="'gudang/gudang-detail/'+dataGudang.gudangs[dataGudang.gudangs.indexOf(item)].id" v-on="on" class="ma-4"><v-icon>mdi-table-eye</v-icon></v-btn>
+                    <v-btn color="primary" :to="'suppliers/supplier-detail/'+dataSuppliers.suppliers[dataSuppliers.suppliers.indexOf(item)].id" v-on="on" class="ma-4"><v-icon>mdi-table-eye</v-icon></v-btn>
                   </template>
-                  <span>Detail Gudang</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on }">
-                    <v-btn color="error" @click="deleteGudang(dataGudang.gudangs[dataGudang.gudangs.indexOf(item)].id)" v-on="on" class="ma-4"><v-icon>mdi-delete-forever</v-icon></v-btn>
-                  </template>
-                  <span>Delete Data ?</span>
+                  <span>Detail Supplier</span>
                 </v-tooltip>
               </template>
             </v-data-table>
             <v-divider/>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="success" :to="'gudang/add-gudang'"><v-icon>mdi-plus</v-icon>Tambah Gudang</v-btn>
+              <v-btn color="success" :to="'suppliers/add-supplier'"><v-icon>mdi-plus</v-icon>Tambah Supplier</v-btn>
             </v-card-actions>
           </v-card>
       </v-container>
@@ -65,7 +59,6 @@ export default {
     Header
   },
   data: () => ({
-    loading: true,
     items: [
         {
           text: 'Dashboard',
@@ -73,28 +66,27 @@ export default {
           href: '/',
         },
         {
-          text: 'Gudang',
+          text: 'Suppliers',
           disabled: true,
-          href: '/show-accounts',
         },
       ],
-    dataGudang : [],
-    dataGudangLength : 0,
-    dialog: false,
-    drawer: null,
-    search: '',
+    dataSuppliers : [],
+    dataSuppliersLength : null,
     pagination: {
       itemsPerPage: 5,
     },
+    loading: false,
+    dialog: false,
+    drawer: null,
+    search: '',
         headers: [
           {
-            text: 'Nama Gudang',
+            text: 'Nama Supplier',
             align: 'left',
             sortable: false,
-            value: 'name',
+            value: 'nama',
           },
           { text: 'Alamat', value: 'alamat' },
-          { text: 'Status', value: 'status' },
           {
             text: 'Aksi',
             align: 'left',
@@ -107,11 +99,11 @@ export default {
     getItems(){
       this.loading = true
       axios.defaults.headers = {
-        'Authorization': window.localStorage.getItem('access_token')
+        'Authorization': this.$store.state.token
       }
-      axios.get('/gudang')
+      axios.get('/suppliers')
       .then(response => {
-          this.dataGudangLength =  response.data.gudangs.length
+          this.dataSuppliersLength =  response.data.suppliers.length
       })
       .catch(error =>{
           console.log(error.response)
@@ -120,11 +112,11 @@ export default {
     getItemsPage(){
       this.loading = true
       axios.defaults.headers = {
-        'Authorization': window.localStorage.getItem('access_token')
+        'Authorization': this.$store.state.token
       }
-      axios.get('/gudang?limit='+this.pagination.itemsPerPage+'&page='+this.pagination.page)
+      axios.get('/suppliers?limit='+this.pagination.itemsPerPage+'&page='+this.pagination.page)
       .then(response => {
-          this.dataGudang = response.data
+          this.dataSuppliers = response.data
           this.loading = false
       })
       .catch(error =>{
@@ -134,11 +126,11 @@ export default {
     searchItemsTotal(){
       this.loading = true
       axios.defaults.headers = {
-        'Authorization': window.localStorage.getItem('access_token')
+        'Authorization': this.$store.state.token
       }
-      axios.get('/gudang/search?query='+this.search+'&pager.limit='+100+'&pager.page='+1)
+      axios.get('/suppliers/search?query='+this.search+'&pager.limit='+100+'&pager.page='+1)
       .then(response => {
-          this.dataGudangLength =  response.data.gudangs.length
+          this.dataSuppliersLength =  response.data.gudangs.length
           //console.log(JSON.stringify(this.dataItems))
       })
       .catch(error =>{
@@ -148,26 +140,17 @@ export default {
     searchItems(){
       this.loading = true
       axios.defaults.headers = {
-        'Authorization': window.localStorage.getItem('access_token')
+        'Authorization': this.$store.state.token
       }
-      axios.get('/gudang/search?query='+this.search+'&pager.limit='+this.pagination.itemsPerPage+'&pager.page='+1)
+      axios.get('/suppliers/search?query='+this.search+'&pager.limit='+this.pagination.itemsPerPage+'&pager.page='+1)
       .then(response => {
-          this.dataGudang = response.data
+          this.dataSuppliers = response.data
           this.loading = false
       })
       .catch(error =>{
           console.log(error.response)
       })
     },
-    deleteGudang(id){
-      var hapus = confirm("Apakah anda yakin akan menghapus gudang ini ?");
-      if(hapus){
-        this.$router.push("gudang/delete-gudang/"+id)
-        console.log(id)
-      }else{
-        alert("Anda batal menghapus gudang...")
-      }
-    }
   },
   mounted(){
     this.getItems()
@@ -188,5 +171,5 @@ export default {
       }
     }
   },
-};
+}
 </script>

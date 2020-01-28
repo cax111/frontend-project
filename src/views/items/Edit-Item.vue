@@ -220,7 +220,7 @@
             <v-btn
               color="success"
               class="mr-4"
-              @click="addItems"
+              @click="editItems"
             >
               Simpan
             </v-btn>
@@ -243,7 +243,7 @@ export default {
     Header
   },
   data: () => ({
-    items: [
+      items: [
         {
           text: 'Dashboard',
           disabled: false,
@@ -269,33 +269,36 @@ export default {
       minSuppliers: [],
       avgSuppliers: [],
       sup_ids: [],
+      supp_ids: [],
       dataGudang: [],
       checkboxGudang: [],
       upperGudang: [],
       underGudang: [],
       qtyGudang: [],
       gudang_qty: [],
+      loc_qty: [],
       select: null,
       dataSelect: [],
-    valid: true,
-    checkbox: false,
-        kode_barang: '',
-        kodeRules: [
-          v => !!v || 'Kode Barang harus diisi',
-        ],
-        name: '',
-        nameRules: [
-          v => !!v || 'Nama harus diisi',
-          //v => (v && v.length <= 10) || 'Name must be less than 10 characters',
-        ],
-        description: '',
-        descriptionRules: [
-          v => !!v || 'Deskripsi harus diisi',
-        ],
-        kategoriRules: [
-          v => !!v || 'Kategori harus diisi',
-        ],
-        kategori: [],
+      dataItems: [],
+      valid: true,
+      checkbox: false,
+      kode_barang: '',
+      kodeRules: [
+        v => !!v || 'Kode Barang harus diisi',
+      ],
+      name: '',
+      nameRules: [
+        v => !!v || 'Nama harus diisi',
+        //v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+      ],
+      description: '',
+      descriptionRules: [
+        v => !!v || 'Deskripsi harus diisi',
+      ],
+      kategoriRules: [
+        v => !!v || 'Kategori harus diisi',
+      ],
+      kategori: [],
   }),
   methods: {
     addKategori(){
@@ -308,7 +311,7 @@ export default {
         this.banyakKategori.pop()
       }
     },
-    addItems(){
+    editItems(){
       if (this.$refs.form.validate()) {
         this.snackbar = true
         for(let i=0;i<this.checkboxGudang.length;i++){
@@ -321,6 +324,7 @@ export default {
             })
           }
         }
+        console.log(this.gudang_qty);
         for(let i=0;i<this.checkboxSuppliers.length;i++){
           if(this.checkboxSuppliers[i]!=null){
             this.sup_ids.push({
@@ -333,8 +337,9 @@ export default {
             })
           }
         }
-        console.log(this.gudang_qty)
-        axios.post('/items', {
+        console.log(this.sup_ids);
+        axios.put('/items', {
+          id: this.$route.params.id,
           name: this.name,
           kode_barang: this.kode_barang,
           description: this.description,
@@ -354,6 +359,27 @@ export default {
         .catch(error =>{
             console.log(error.response)
         })
+        // axios.put('/quantity', {
+        //   id: this.$route.params.id,
+        //   name: this.name,
+        //   kode_barang: this.kode_barang,
+        //   description: this.description,
+        //   unit_id: this.select,
+        //   categories: this.banyakKategori,
+        //   loc_qty:{
+        //     gudang_qty: this.gudang_qty
+        //   },
+        //   sup_ids:{
+        //     sup_ids: this.sup_ids
+        //   }
+        // })
+        // .then(response => {
+        //   console.log(JSON.stringify(response.data))
+        //   this.$router.back()
+        // })
+        // .catch(error =>{
+        //     console.log(error.response)
+        // })
       }
     },
     kembali () {
@@ -361,9 +387,6 @@ export default {
     },
   },
   mounted(){
-    axios.defaults.headers = {
-      'Authorization': window.localStorage.getItem('access_token')
-    }
     axios.post('/units/search', {
       query: "",
       pager: {
@@ -372,8 +395,8 @@ export default {
       },
     })
     .then(response => {
-      console.log(JSON.stringify(response.data.units))
-      this.dataSelect = response.data.units
+      this.dataSelect = response.data.units;
+      //console.log(JSON.stringify(response.data.units))
     })
     .catch(error =>{
         console.log(error.response)
@@ -381,7 +404,9 @@ export default {
 
     axios.get('/gudang')
     .then(response => {
-      this.dataGudang = response.data.gudangs
+      let v = this;
+      setTimeout(function () { v.dataGudang = response.data.gudangs; }, 500)
+      //console.log(this.dataGudang);
     })
     .catch(error =>{
         console.log(error.response)
@@ -389,16 +414,69 @@ export default {
 
     axios.get('/suppliers')
     .then(response => {
-      this.dataSuppliers = response.data.suppliers
-      console.log(this.dataSuppliers)
+      let v = this;
+      setTimeout(function () { v.dataSuppliers = response.data.suppliers; }, 500)
+      //console.log(this.dataSuppliers);
     })
     .catch(error =>{
         console.log(error.response)
     })
+
+    axios.get('/items/'+this.$route.params.id)
+    .then(response => {
+      this.dataItems = response.data;
+      this.name = this.dataItems.name;
+      this.kode_barang = this.dataItems.kode_barang;
+      this.description = this.dataItems.description;
+      this.select = this.dataItems.unit.id;
+      this.banyakKategori = this.dataItems.categories;
+      this.loc_qty = this.dataItems.loc_qty;
+      this.supp_ids = this.dataItems.sup_ids;
+      console.log(this.dataItems);
+    })
+    .catch(error =>{
+        console.log(error.response);
+    })
   },
   watch:{
     checkboxGudang: function(){
-      console.log(this.checkboxGudang)
+      console.log(this.checkboxGudang);
+    },
+    dataGudang: function(){
+      if(this.dataGudang!==null){
+        for(let i=0;i<this.dataGudang.length;i++){
+          for(let j=0;j<this.loc_qty.gudang_qty.length;j++){
+            if(this.dataGudang[i].id===this.loc_qty.gudang_qty[j].gudang_id){
+              this.checkboxGudang[i] = this.loc_qty.gudang_qty[j].gudang_id;
+              this.upperGudang[i] = this.loc_qty.gudang_qty[j].upper;
+              this.underGudang[i] = this.loc_qty.gudang_qty[j].under;
+              this.qtyGudang[i] = this.loc_qty.gudang_qty[j].qty;
+              console.log(this.dataGudang);
+              break;
+            }else{
+              this.checkboxGudang[i] = null;
+            }
+          }
+        }
+      }
+    },
+    dataSuppliers: function(){
+      if(this.dataSuppliers!==null){
+        for(let i=0;i<this.dataSuppliers.length;i++){
+          for(let j=0;j<this.supp_ids.sup_ids.length;j++){
+            if(this.dataSuppliers[i].id===this.supp_ids.sup_ids[j].sup_id){
+              this.checkboxSuppliers[i] = this.supp_ids.sup_ids[j].sup_id;
+              this.kodeSuppliers[i] = this.supp_ids.sup_ids[j].kode_barang_supplier;
+              this.namaSuppliers[i] = this.supp_ids.sup_ids[j].nama_barang_supplier;
+              this.maxSuppliers[i] = this.supp_ids.sup_ids[j].harga_max;
+              this.minSuppliers[i] = this.supp_ids.sup_ids[j].harga_min;
+              this.avgSuppliers[i] = this.supp_ids.sup_ids[j].harga_avg;
+              console.log(this.dataSuppliers);
+              break;
+            }
+          }
+        }
+      }
     }
   }
 };

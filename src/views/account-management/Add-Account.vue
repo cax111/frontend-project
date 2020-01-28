@@ -7,9 +7,6 @@
     <v-content>
       <v-container>
         <v-breadcrumbs :items="items">
-          <template v-slot:divider>
-            <v-icon>mdi-forward</v-icon>
-          </template>
         </v-breadcrumbs>
         <v-card
           class="mx-auto"
@@ -54,6 +51,12 @@
                 class="input-group--focused"
                 @click:append="show = !show"
               ></v-text-field>
+              <v-select
+                v-model="role"
+                :items="tipeAkun"
+                label="Tipe Akun"
+                v-if="roleUserLogin==='SUPERADMIN'"
+              ></v-select>
               <v-spacer></v-spacer>
               <v-checkbox
                 v-model="checkbox"
@@ -121,6 +124,7 @@
             href: 'breadcrumbs_link_2',
           },
         ],
+        tipeAkun: ['USER','WAREHOUSE_ADMIN','ADMIN'],
       valid: true,
       name: '',
       dataUser: [],
@@ -142,6 +146,8 @@
           v => !!v || 'Password ini harus diisi',
           v => v.length >= 8 || 'Min 8 karakter',
       ],
+      roleUserLogin: window.localStorage.getItem('role'),
+      role: null,
       show: false,
       checkbox: false,
     }),
@@ -149,33 +155,32 @@
     methods: {
       addAccount () {
         if (this.$refs.form.validate()) {
-          this.snackbar = true
-
-          axios.defaults.headers = {
-            'Authorization': this.$store.state.token
+          this.snackbar = true;
+          if(window.localStorage.getItem('role')==="ADMIN" || window.localStorage.getItem('role')==="WAREHOUSE_ADMIN"){
+            this.role="USER";
           }
           axios.post('/users', {
             id: this.$route.params.id,
             name: this.name,
             email: this.email,
             phone: this.phone,
-            role: "USER",
+            role: this.role,
             password: this.password,
           })
           .then(response => {
-              console.log(JSON.stringify(response.data))
-              this.$router.back()
+              console.log(JSON.stringify(response.data));
+              this.$router.back();
           })
           .catch(error =>{
-              console.log(error.response)
+              console.log(error.response);
           })
         }
       },
       reset () {
-        this.$refs.form.reset()
+        this.$refs.form.reset();
       },
       kembali () {
-        this.$router.back()
+        this.$router.back();
       },
     },
   }
