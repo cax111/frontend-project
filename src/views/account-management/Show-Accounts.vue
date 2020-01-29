@@ -41,7 +41,7 @@
                 </v-tooltip>
                 <v-tooltip bottom v-if="role === 'SUPERADMIN'">
                   <template v-slot:activator="{ on }">
-                    <v-btn color="error" @click="deleteAkun(showDataUsers[showDataUsers.indexOf(item)].id)" v-on="on"><v-icon>mdi-delete-forever</v-icon></v-btn>
+                    <v-btn color="error" @click="deleteAkun(showDataUsers[showDataUsers.indexOf(item)].id)" v-on="on" class="ma-4"><v-icon>mdi-delete-forever</v-icon></v-btn>
                   </template>
                   <span>Delete Data ?</span>
                 </v-tooltip>
@@ -128,9 +128,6 @@ export default {
   },
   mounted(){
     this.role = window.localStorage.getItem('role')
-    axios.defaults.headers = {
-      'Authorization': window.localStorage.getItem('access_token')
-    }
     axios.get('/users')
     .then(response => {
         this.dataUsers = response.data
